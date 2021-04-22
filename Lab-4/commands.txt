@@ -1,0 +1,117 @@
+sharan@sharan-VirtualBox:~$ cd ~/Downloads/hadoop-3.2.2/bin 
+
+sharan@sharan-VirtualBox:~/Downloads/hadoop-3.2.2/bin$ 
+
+sharan@sharan-VirtualBox:~/Downloads/hadoop-3.2.2/bin$ sudo su hduser
+[sudo] password for sharan: 
+No passwd entry for user 'hduser'
+
+shashidhar@sharan-VirtualBox:~/Downloads/hadoop-3.2.2/bin$ hadoop version
+Hadoop 3.2.2
+Source code repository Unknown -r 7a3bc90b05f257c8ace2f76d74264906f0f7a932
+Compiled by hexiaoqiao on 2021-01-03T09:26Z
+Compiled with protoc 2.5.0
+From source with checksum 5a8f564f46624254b27f6a33126ff4
+This command was run using /home/sharan/Downloads/hadoop-3.2.2/share/hadoop/common/hadoop-common-3.2.2.jar
+
+
+sharan@sharan-VirtualBox:~/Downloads/hadoop-3.2.2/bin$ cd ~
+
+shashidhar@sharan-VirtualBox:~$  start-all.sh
+WARNING: Attempting to start all Apache Hadoop daemons as sharan in 10 seconds.
+WARNING: This is not a recommended production deployment configuration.
+WARNING: Use CTRL-C to abort.
+Starting namenodes on [localhost]
+localhost: namenode is running as process 11886.  Stop it first.
+pdsh@sharan-VirtualBox: localhost: ssh exited with exit code 1
+Starting datanodes
+localhost: datanode is running as process 12041.  Stop it first.
+pdsh@shashidhar-VirtualBox: localhost: ssh exited with exit code 1
+Starting secondary namenodes [sharan-VirtualBox]
+sharan-VirtualBox: secondarynamenode is running as process 12274.  Stop it first.
+pdsh@sharan-VirtualBox: sharan-VirtualBox: ssh exited with exit code 1
+Starting resourcemanager
+Starting nodemanagers
+
+
+sharan@sharan-VirtualBox:~$ jps
+12274 SecondaryNameNode
+15910 NodeManager
+16342 Jps
+12041 DataNode
+15753 ResourceManager
+11886 NameNode
+
+sharan@sharan-VirtualBox:~$ hadoop fs -mkdir /newDataFlair
+
+sharan@sharan-VirtualBox:~$ hadoop fs -ls /
+Found 1 items
+drwxr-xr-x   - sharan supergroup          0 2021-04-22 15:46 /newDataFlair
+
+
+sharan@sharan-VirtualBox:~$ hdfs dfs -copyFromLocal ~/temp.txt /newDataFlair
+
+sharan@sharan-VirtualBox:~$ hdfs dfs -ls /newDataFlair
+Found 1 items
+-rw-r--r--   1 sharan supergroup         89 2021-04-22 15:53 /newDataFlair/temp.txt
+
+
+sharan@sharan-VirtualBox:~$ hadoop fs -count -q /newDataFlair
+        none             inf            none             inf            1            1                 89 /newDataFlair
+
+
+sharan@sharan-VirtualBox:~$ hdfs dfs -cat /newDataFlair/temp.txt
+hi how are you
+how is your job
+how is your family
+how is your brother
+how is your sister
+sharan@sharan-VirtualBox:~$  hdfs dfs -mkdir /sample
+
+sharan@sharan-VirtualBox:~$ hdfs dfs -cp /newDataFlair/temp.txt /sample/copyfile
+
+sharan@sharan-VirtualBox:~$ hdfs dfs -cat /sample/copyfile
+hi how are you
+how is your job
+how is your family
+how is your brother
+how is your sister
+
+
+sharan@sharan-VirtualBox:~$ hadoop fs -du -h -x /sample/copyfile
+89  89  /sample/copyfile
+
+sharan@sharan-VirtualBox:~$ hadoop fs -mkdir /dataflair
+
+sharan@sharan-VirtualBox:~$ hadoop fs -mv /newDataFlair/temp.txt /dataflair
+
+sharan@sharan-VirtualBox:~$ hadoop fs -ls /dataflair
+Found 1 items
+-rw-r--r--   1 sharan supergroup         89 2021-04-22 15:53 /dataflair/temp.txt
+
+sharan@sharan-VirtualBox:~$ hadoop fs -rm /sample/copyfile
+Deleted /sample/ 
+sharan@sharan-VirtualBox:~$ hadoop fs -rm -R /newDataFlair
+Deleted /newDataFlair
+
+sharan@sharan-VirtualBox:~$ hadoop fs -ls / 
+Found 2 items
+drwxr-xr-x   - sharan supergroup          0 2021-04-22 15:58 /dataflair
+drwxr-xr-x   - sharan supergroup          0 2021-04-22 15:58 /sample
+
+
+
+sharan@sharan-VirtualBox:~$ hadoop fs -appendToFile ~/shashidhar.txt /dataflair/temp.txt
+
+sharan@sharan-VirtualBox:~$ hdfs dfs -cat /dataflair/temp.txt
+hi how are you
+how is your job
+how is your family
+how is your brother
+how is your sister
+
+sharan@sharan-VirtualBox:~$ hadoop fs -truncate 3 /dataflair/temp.txt
+Truncating /dataflair/temp.txt to length: 3. Wait for block recovery to complete before further updating this file.
+
+sharan@sharan-VirtualBox:~$ hdfs dfs -cat /dataflair/temp.txt
+hi
